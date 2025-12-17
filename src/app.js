@@ -11,7 +11,7 @@ const DB = pool;
 // CORS 설정: 프론트엔드 주소만 허용 (보안)
 app.use(
   cors({
-    origin: "http://localhost:5713", // React 주소
+    origin: "http://localhost:5173", // Vite 개발 서버 기본 포트
     credentials: true, // 쿠키/세션 허용 시 true
   })
 );
