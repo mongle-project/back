@@ -1,29 +1,31 @@
-import express from 'express';
-import cors from 'cors';
-import apiRouter from './routes/index.js'; 
-
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import apiRouter from "./routes/index.js";
+import pool from "./config/db.config.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-
+const DB = pool;
 
 // CORS 설정: 프론트엔드 주소만 허용 (보안)
-app.use(cors({
-  origin: 'http://localhost:5713', // React 주소
-  credentials: true,               // 쿠키/세션 허용 시 true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5713", // React 주소
+    credentials: true, // 쿠키/세션 허용 시 true
+  })
+);
 
-app.use(express.json()); // JSON 데이터 파싱 
+app.use(express.json()); // JSON 데이터 파싱
 
 // 라우팅 설정
 // localhost:3001/api/... 로 들어오는 모든 요청은 apiRouter로 보냄
-app.use('/api', apiRouter);
+app.use("/api", apiRouter);
 
 // 기본 경로 (Health Check용)
-app.get('/', (req, res) => {
-  res.send('Mongle Mongle API Server is running... 🐶');
+app.get("/", (req, res) => {
+  res.send("Mongle Mongle API Server is running... 🐶");
 });
-
 
 // (1) 404 Not Found (위의 경로에 해당 안 되는 경우)
 app.use((req, res, next) => {
