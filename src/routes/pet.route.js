@@ -1,12 +1,16 @@
 import express from "express";
+import {
+  createPet,
+  getMyPets,
+  updatePet,
+  deletePet,
+} from "../controllers/pet.controller.js";
 
 const router = express.Router();
 
-// TODO: 반려동물 관련 라우트 추가
-// router.get('/', ...);
-// router.post('/', ...);
-// router.get('/:id', ...);
-// router.put('/:id', ...);
-// router.delete('/:id', ...);
+router.post("/", createPet);
+router.get("/", getMyPets);
+router.patch("/:petid", updatePet);
+router.delete("/:petid", deletePet);
 
 export default router;
