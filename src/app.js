@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import apiRouter from "./routes/index.js";
 import pool from "./config/db.config.js";
+import { startNewsCronJob, initializeNewsCache } from './jobs/news.job.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,6 +34,10 @@ app.use((req, res, next) => {
   error.status = 404;
   next(error);
 });
+
+// 서버 시작 전 초기 크롤링 및 크론잡 시작
+await initializeNewsCache();
+startNewsCronJob();
 
 // 서버 실행
 app.listen(PORT, () => {
