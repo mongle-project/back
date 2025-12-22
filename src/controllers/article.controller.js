@@ -2,18 +2,18 @@ import articles from "../services/article.service.js";
 
 const createArticle = async (req, res) => {
   try {
-    const { title, content, category, img_url } = req.body;
-    const userId = req.user.id; // Assuming user ID is available in req.user
+    // const { title, content, category, img_url } = req.body;
+    // const userId = req.user.id; // Assuming user ID is available in req.user
 
-    const newArticle = await articles.createArticle({
-      userId,
-      title,
-      content,
-      category,
-      img_url,
-    });
+    // const newArticle = await articles.createArticle({
+    //   userId,
+    //   title,
+    //   content,
+    //   category,
+    //   img_url,
+    // });
 
-    res.status(201).json({ article: newArticle });
+    res.status(200).json({ messsage: "success" });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -32,30 +32,30 @@ const getArticles = async (req, res) => {
 
 const getArticleById = async (req, res) => {
   try {
-    const articleId = req.params.id;
-    const article = await articles.getArticleById(articleId);
+    // const articleId = req.params.id;
+    // const article = await articles.getArticleById(articleId);
     if (!article) {
       return res.status(404).json({ message: "Article not found" });
     }
-    res.status(200).json({ article });
+    res.status(200).json({ messsage: "success" });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 };
 const updateArticle = async (req, res) => {
   try {
-    const articleId = req.params.id;
-    const { title, content, category, img_url } = req.body;
-    const updatedArticle = await articles.updateArticle(articleId, {
-      title,
-      content,
-      category,
-      img_url,
-    });
+    // const articleId = req.params.id;
+    // const { title, content, category, img_url } = req.body;
+    // const updatedArticle = await articles.updateArticle(articleId, {
+    //   title,
+    //   content,
+    //   category,
+    //   img_url,
+    // });
     if (!updatedArticle) {
       return res.status(404).json({ message: "Article not found" });
     }
-    res.status(200).json({ article: updatedArticle });
+    res.status(200).json({ messsage: "success" });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -63,12 +63,12 @@ const updateArticle = async (req, res) => {
 
 const deleteArticle = async (req, res) => {
   try {
-    const articleId = req.params.id;
-    const deleted = await articles.deleteArticle(articleId);
+    // const articleId = req.params.id;
+    // const deleted = await articles.deleteArticle(articleId);
     if (!deleted) {
       return res.status(404).json({ message: "Article not found" });
     }
-    res.status(200).json({ message: "Article deleted successfully" });
+    res.status(200).json({ messsage: "success" });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }

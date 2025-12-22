@@ -11,13 +11,13 @@ router.post("/", articleController.createArticle);
 router.get("/", articleController.getArticles);
 
 //update article
-router.patch("/:id", articleController.updateArticle);
+router.patch("/:articleid", articleController.updateArticle);
 
 //delete article
-router.delete("/:id", articleController.deleteArticle);
+router.delete("/:articleid", articleController.deleteArticle);
 
 //article report
-router.post("/:id/report", articleController.reportArticle);
+router.post("/:articleid/report", articleController.reportArticle);
 
 // TODO: Add a route related to the post
 // router.get('/', ...);
