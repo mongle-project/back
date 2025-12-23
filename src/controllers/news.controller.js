@@ -12,8 +12,12 @@ export const getNews = async (req, res) => {
       message: '뉴스 조회 성공',
       cached: result.cached,
       lastUpdated: new Date(result.lastUpdated).toISOString(),
-      count: result.data.length,
-      data: result.data,
+      count: {
+        news: result.news.length,
+        familyInfo: result.familyInfo.length,
+      },
+      news: result.news,
+      familyInfo: result.familyInfo,
     });
 
   } catch (error) {
@@ -37,8 +41,12 @@ export const refreshNews = async (req, res) => {
       message: '뉴스 캐시 갱신 완료',
       lastUpdated: new Date(cache.lastUpdated).toISOString(),
       expiresAt: new Date(cache.expiresAt).toISOString(),
-      count: cache.data.length,
-      data: cache.data,
+      count: {
+        news: cache.news.length,
+        familyInfo: cache.familyInfo.length,
+      },
+      news: cache.news,
+      familyInfo: cache.familyInfo,
     });
 
   } catch (error) {
@@ -60,13 +68,16 @@ export const getCacheStatus = (req, res) => {
 
     res.status(200).json({
       message: '캐시 상태 조회 성공',
-      ...status,
+      newsCount: status.newsCount,
+      familyInfoCount: status.familyInfoCount,
+      totalCount: status.totalCount,
       lastUpdated: status.lastUpdated
         ? new Date(status.lastUpdated).toISOString()
         : null,
       expiresAt: status.expiresAt
         ? new Date(status.expiresAt).toISOString()
         : null,
+      isExpired: status.isExpired,
     });
 
   } catch (error) {
