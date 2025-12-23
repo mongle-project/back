@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as userModel from "../models/user.model.js";
+import bcrypt from "bcrypt";
 
 const ACCESS_TOKEN_SECRET =
   process.env.JWT_ACCESS_SECRET || "dev-access-secret";
@@ -8,40 +8,6 @@ const REFRESH_TOKEN_SECRET =
   process.env.JWT_REFRESH_SECRET || "dev-refresh-secret";
 const ACCESS_TOKEN_EXPIRES_IN = "15m";
 const REFRESH_TOKEN_EXPIRES_IN = "7d";
-
-/**
- * 이메일 형식 검증
- * @param {string} email
- * @returns {boolean}
- */
-export const validateEmail = (email) => {
-  if (!email) return false;
-  // 간단한 이메일 형식 체크
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-/**
- * 비밀번호 형식 검증
- *  - 최소 8자리
- *  - 특수문자(!@#$%^&*) 1개 이상 포함
- * @param {string} password
- * @returns {boolean}
- */
-export const validatePassword = (password) => {
-  if (!password) return false;
-  const lengthOk = password.length >= 8;
-  const specialCharRegex = /[!@#$%^&*]/;
-  return lengthOk && specialCharRegex.test(password);
-};
-
-/**
- * 비밀번호 해시 생성
- */
-export const hashPassword = async (plainPassword) => {
-  const saltRounds = 10;
-  return await bcrypt.hash(plainPassword, saltRounds);
-};
 
 /**
  * 액세스 토큰 생성
@@ -84,24 +50,17 @@ export const verifyRefreshToken = (token) => {
 
 /**
  * 로그인 처리
- *  - id와 password를 사용합니다.
  */
-export const login = async ({ id, password }) => {
-  if (!id) {
-    throw new Error("ID는 필수입니다.");
-  }
-  if (typeof id !== "string") {
-    throw new Error("ID는 문자열이어야 합니다.");
-  }
-
-  const user = await userModel.findUserById(id);
+export const login = async ({ userid, password }) => {
+  const user =
+    (userid && (await userModel.findUserByUserId(userid))) ||
+    (await userModel.findUserByEmail(userid));
   if (!user) {
     throw new Error("존재하지 않는 사용자입니다.");
   }
 
-  // bcrypt로 해시된 비밀번호 비교
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
+  const isValid = await bcrypt.compare(password, user.password);
+  if (!isValid) {
     throw new Error("비밀번호가 올바르지 않습니다.");
   }
 
@@ -130,7 +89,7 @@ export const refreshTokens = async (refreshToken) => {
   }
 
   // 사용자가 아직 존재하는지 확인 (탈퇴 등 대비)
-  const user = await userModel.findUserById(payload.userId);
+  const user = await userModel.findUserByEmail(payload.email);
   if (!user) {
     throw new Error("사용자를 찾을 수 없습니다.");
   }
