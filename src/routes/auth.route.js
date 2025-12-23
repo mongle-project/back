@@ -3,10 +3,6 @@ import * as authController from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
-// 회원가입
-// POST /api/auth/register
-router.post("/register", authController.registerUser);
-
 // 로그인
 // POST /api/auth/login
 router.post("/login", authController.loginUser);

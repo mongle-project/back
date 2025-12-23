@@ -1,5 +1,6 @@
 import express from "express";
 import * as userController from "../controllers/user.controller.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -7,10 +8,12 @@ const router = express.Router();
 // POST /api/users
 router.post("/", userController.registerUser);
 
-// TODO: 추후 사용자 조회/수정/삭제 라우트 추가 가능
-// router.get('/', userController.getUsers);
-// router.get('/:id', userController.getUserById);
-// router.put('/:id', userController.updateUser);
-// router.delete('/:id', userController.deleteUser);
+// 내 정보 조회
+// GET /api/users/me
+router.get("/me", authMiddleware, userController.getMyProfile);
+
+// 비밀번호 재설정 (비로그인)
+// PATCH /api/users/me/password
+router.patch("/me/password", userController.resetPassword);
 
 export default router;
