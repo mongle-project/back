@@ -44,18 +44,38 @@ export const getMyProfile = async (req, res) => {
 };
 
 /**
+ * 아이디 찾기
+ * POST /api/users/find-email
+ */
+export const findEmail = async (req, res) => {
+  try {
+    const { userid, email } = req.body;
+
+    await userService.verifyUserIdentity({ userid, email });
+
+    return res.status(200).json({
+      message: "사용자 인증이 완료되었습니다.",
+    });
+  } catch (error) {
+    console.error("아이디 찾기 오류:", error);
+    return res.status(400).json({
+      message: error.message || "사용자 인증에 실패했습니다.",
+    });
+  }
+};
+
+/**
  * 비밀번호 재설정
  * PATCH /api/users/me/password
  */
 export const resetPassword = async (req, res) => {
   try {
-    const { userid, email, newPassword, newPasswordConfirm } = req.body;
+    const { userid, email, newPassword } = req.body;
 
     await userService.resetPassword({
       userid,
       email,
       newPassword,
-      newPasswordConfirm,
     });
 
     return res.status(204).send();
