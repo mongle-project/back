@@ -36,6 +36,15 @@ export const countArticles = async () => {
 };
 
 /**
+ * 내가 작성한 게시글 수 조회
+ */
+export const countMyArticles = async (userId) => {
+  const query = `SELECT COUNT(*) as count FROM articles WHERE user_id = ?`;
+  const [rows] = await pool.query(query, [userId]);
+  return rows[0].count;
+};
+
+/**
  * 게시글 단일 조회 (기본, 통계 없음)
  */
 export const findArticleById = async (articleId) => {
@@ -131,6 +140,47 @@ export const getArticlesWithStats = async (limit, offset, userId = null) => {
 
   const params = userId ? [userId, userId, limit, offset] : [limit, offset];
   const [rows] = await pool.query(query, params);
+  return rows;
+};
+
+/**
+ * 내가 작성한 게시글 목록 조회 (통계 포함)
+ */
+export const getMyArticlesWithStats = async (limit, offset, userId) => {
+  const query = `
+    SELECT
+      a.id,
+      a.user_id,
+      a.title,
+      a.content,
+      a.category,
+      a.img_url,
+      a.created_at,
+      a.updated_at,
+      COALESCE(likes.count, 0) AS likesCount,
+      0 AS commentsCount,
+      COALESCE(bookmarks.count, 0) AS bookmarksCount,
+      IF(user_likes.user_id IS NOT NULL, true, false) AS liked,
+      IF(user_bookmarks.user_id IS NOT NULL, true, false) AS bookmarked
+    FROM articles a
+    LEFT JOIN (
+      SELECT article_id, COUNT(*) AS count
+      FROM article_likes
+      GROUP BY article_id
+    ) likes ON a.id = likes.article_id
+    LEFT JOIN (
+      SELECT article_id, COUNT(*) AS count
+      FROM user_save_articles
+      GROUP BY article_id
+    ) bookmarks ON a.id = bookmarks.article_id
+    LEFT JOIN article_likes user_likes ON a.id = user_likes.article_id AND user_likes.user_id = ?
+    LEFT JOIN user_save_articles user_bookmarks ON a.id = user_bookmarks.article_id AND user_bookmarks.user_id = ?
+    WHERE a.user_id = ?
+    ORDER BY a.created_at DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  const [rows] = await pool.query(query, [userId, userId, userId, limit, offset]);
   return rows;
 };
 

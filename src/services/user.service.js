@@ -83,24 +83,29 @@ export const getProfile = async (userId) => {
 };
 
 /**
- * 비밀번호 재설정
+ * 사용자 신원 확인 (아이디 찾기)
  */
-export const resetPassword = async ({
-  userid,
-  email,
-  newPassword,
-  newPasswordConfirm,
-}) => {
+export const verifyUserIdentity = async ({ userid, email }) => {
   if (!userid || !email) {
     throw new Error("userid와 email이 모두 필요합니다.");
   }
 
-  if (!newPassword || !newPasswordConfirm) {
-    throw new Error("새 비밀번호와 확인값이 모두 필요합니다.");
+  const user = await userModel.findUserByUserId(userid);
+  if (!user) {
+    throw new Error("사용자를 찾을 수 없습니다.");
   }
 
-  if (newPassword !== newPasswordConfirm) {
-    throw new Error("새 비밀번호와 확인값이 일치하지 않습니다.");
+  if (email !== user.email) {
+    throw new Error("요청한 이메일이 사용자 정보와 일치하지 않습니다.");
+  }
+};
+
+/**
+ * 비밀번호 재설정
+ */
+export const resetPassword = async ({ userid, email, newPassword }) => {
+  if (!userid || !email) {
+    throw new Error("userid와 email이 모두 필요합니다.");
   }
 
   if (!validatePassword(newPassword)) {

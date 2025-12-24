@@ -65,6 +65,29 @@ export const getArticles = async (req, res) => {
 };
 
 /**
+ * 내가 작성한 게시글 목록 조회
+ * GET /api/articles/me/my-articles
+ */
+export const getMyArticles = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
+    const userId = req.user.userId; // authMiddleware로 보호됨
+
+    const result = await articleService.getMyArticles(limit, offset, userId);
+
+    res.status(200).json({
+      message: "내 게시글 목록 조회 성공",
+      data: result.data,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    console.error("내 게시글 목록 조회 오류:", error);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
+
+/**
  * 게시글 상세 조회
  * GET /api/articles/:articleId
  */
