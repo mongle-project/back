@@ -12,6 +12,10 @@ router.post("/", userController.registerUser);
 // GET /api/users/me
 router.get("/me", authMiddleware, userController.getMyProfile);
 
+// 아이디 찾기
+// POST /api/users/find-email
+router.post("/find-email", userController.findEmail);
+
 // 비밀번호 재설정 (비로그인)
 // PATCH /api/users/me/password
 router.patch("/me/password", userController.resetPassword);
