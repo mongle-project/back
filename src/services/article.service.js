@@ -70,6 +70,27 @@ export const getArticles = async (limit = 20, offset = 0, requestingUserId = nul
 };
 
 /**
+ * 내가 작성한 게시글 목록 조회
+ */
+export const getMyArticles = async (limit = 20, offset = 0, userId) => {
+  // 내 게시글만 조회
+  const articles = await articleModel.getMyArticlesWithStats(limit, offset, userId);
+
+  // 내 게시글 전체 개수 조회
+  const totalCount = await articleModel.countMyArticles(userId);
+
+  return {
+    data: articles,
+    pagination: {
+      limit,
+      offset,
+      totalCount,
+      hasNext: offset + limit < totalCount,
+    },
+  };
+};
+
+/**
  * 게시글 상세 조회
  */
 export const getArticleById = async (articleId, requestingUserId = null) => {

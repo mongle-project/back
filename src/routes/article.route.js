@@ -11,6 +11,9 @@ router.post("/", authMiddleware, upload.single("imageFile"), articleController.c
 // 게시글 목록 조회
 router.get("/", optionalAuthMiddleware, articleController.getArticles);
 
+// 내가 작성한 게시글 목록 조회
+router.get("/me/my-articles", authMiddleware, articleController.getMyArticles);
+
 // 게시글 상세 조회
 router.get("/:articleId", optionalAuthMiddleware, articleController.getArticleDetail);
 
