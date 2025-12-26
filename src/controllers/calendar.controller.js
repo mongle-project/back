@@ -151,7 +151,7 @@ export const updateEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
     const userId = req.user.userId;
-    const updateData = req.body;
+    const { petId, title, category, date, startTime, completed } = req.body;
 
     // eventId 숫자 검증
     const parsedEventId = parseInt(eventId, 10);
@@ -160,6 +160,15 @@ export const updateEvent = async (req, res) => {
         message: "유효하지 않은 일정 ID입니다.",
       });
     }
+
+    // 프론트엔드 필드명을 서비스 레이어 필드명으로 매핑
+    const updateData = {};
+    if (petId !== undefined) updateData.petProfileId = petId;
+    if (title !== undefined) updateData.title = title;
+    if (category !== undefined) updateData.category = category;
+    if (date !== undefined) updateData.eventDate = date;
+    if (startTime !== undefined) updateData.eventTime = startTime;
+    if (completed !== undefined) updateData.isComplete = completed;
 
     const updatedEvent = await calendarService.updateEvent(
       parsedEventId,
