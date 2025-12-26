@@ -112,7 +112,7 @@ export const updatePetProfile = async (req, res) => {
   try {
     const { petId } = req.params;
     const userId = req.user.userId;
-    const { name, species, birthday, gender, feature } = req.body;
+    const { name, species, birthday, gender, feature, removeImage } = req.body;
     const imageFile = req.file;
 
     // petId 숫자 검증
@@ -128,7 +128,7 @@ export const updatePetProfile = async (req, res) => {
     if (gender) updates.gender = gender;
     if (feature !== undefined) updates.feature = feature?.trim() || null;
 
-    const updatedPet = await petService.updatePet(parseInt(petId), userId, updates, imageFile);
+    const updatedPet = await petService.updatePet(parseInt(petId), userId, updates, imageFile, removeImage === "true");
 
     res.status(200).json({
       message: "반려동물 프로필이 수정되었습니다.",

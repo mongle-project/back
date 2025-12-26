@@ -23,7 +23,11 @@ export const createArticle = async (req, res) => {
       category: category?.trim() || null,
     };
 
-    const createdArticle = await articleService.createArticle(userId, articleData, imageFile);
+    const createdArticle = await articleService.createArticle(
+      userId,
+      articleData,
+      imageFile
+    );
 
     res.status(201).json({
       message: "게시글이 작성되었습니다.",
@@ -49,9 +53,15 @@ export const getArticles = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
     const offset = parseInt(req.query.offset) || 0;
+    const sort = req.query.sort || "latest"; // latest, popular, comment
     const userId = req.user?.userId; // optionalAuthMiddleware (있을 수도, 없을 수도)
 
-    const result = await articleService.getArticles(limit, offset, userId);
+    const result = await articleService.getArticles(
+      limit,
+      offset,
+      userId,
+      sort
+    );
 
     res.status(200).json({
       message: "게시글 목록 조회 성공",
@@ -98,10 +108,15 @@ export const getArticleDetail = async (req, res) => {
 
     // articleId 숫자 검증
     if (!articleId || isNaN(parseInt(articleId))) {
-      return res.status(400).json({ message: "유효하지 않은 게시글 ID입니다." });
+      return res
+        .status(400)
+        .json({ message: "유효하지 않은 게시글 ID입니다." });
     }
 
-    const article = await articleService.getArticleById(parseInt(articleId), userId);
+    const article = await articleService.getArticleById(
+      parseInt(articleId),
+      userId
+    );
 
     res.status(200).json({
       message: "게시글 상세 조회 성공",
@@ -132,7 +147,9 @@ export const updateArticle = async (req, res) => {
 
     // articleId 숫자 검증
     if (!articleId || isNaN(parseInt(articleId))) {
-      return res.status(400).json({ message: "유효하지 않은 게시글 ID입니다." });
+      return res
+        .status(400)
+        .json({ message: "유효하지 않은 게시글 ID입니다." });
     }
 
     // 업데이트할 필드만 객체에 포함
@@ -185,7 +202,9 @@ export const deleteArticle = async (req, res) => {
 
     // articleId 숫자 검증
     if (!articleId || isNaN(parseInt(articleId))) {
-      return res.status(400).json({ message: "유효하지 않은 게시글 ID입니다." });
+      return res
+        .status(400)
+        .json({ message: "유효하지 않은 게시글 ID입니다." });
     }
 
     await articleService.deleteArticle(parseInt(articleId), userId);
@@ -221,12 +240,17 @@ export const toggleLike = async (req, res) => {
 
     // articleId 숫자 검증
     if (!articleId || isNaN(parseInt(articleId))) {
-      return res.status(400).json({ message: "유효하지 않은 게시글 ID입니다." });
+      return res
+        .status(400)
+        .json({ message: "유효하지 않은 게시글 ID입니다." });
     }
 
     const result = await articleService.toggleLike(parseInt(articleId), userId);
 
-    const message = result.action === 'added' ? '좋아요가 추가되었습니다.' : '좋아요가 취소되었습니다.';
+    const message =
+      result.action === "added"
+        ? "좋아요가 추가되었습니다."
+        : "좋아요가 취소되었습니다.";
 
     res.status(200).json({
       message,
@@ -256,7 +280,9 @@ export const reportArticle = async (req, res) => {
 
     // articleId 숫자 검증
     if (!articleId || isNaN(parseInt(articleId))) {
-      return res.status(400).json({ message: "유효하지 않은 게시글 ID입니다." });
+      return res
+        .status(400)
+        .json({ message: "유효하지 않은 게시글 ID입니다." });
     }
 
     await articleService.reportArticle(parseInt(articleId), userId);
@@ -292,12 +318,20 @@ export const toggleBookmark = async (req, res) => {
 
     // articleId 숫자 검증
     if (!articleId || isNaN(parseInt(articleId))) {
-      return res.status(400).json({ message: "유효하지 않은 게시글 ID입니다." });
+      return res
+        .status(400)
+        .json({ message: "유효하지 않은 게시글 ID입니다." });
     }
 
-    const result = await articleService.toggleBookmark(parseInt(articleId), userId);
+    const result = await articleService.toggleBookmark(
+      parseInt(articleId),
+      userId
+    );
 
-    const message = result.action === 'added' ? '북마크가 추가되었습니다.' : '북마크가 취소되었습니다.';
+    const message =
+      result.action === "added"
+        ? "북마크가 추가되었습니다."
+        : "북마크가 취소되었습니다.";
 
     res.status(200).json({
       message,
@@ -311,6 +345,33 @@ export const toggleBookmark = async (req, res) => {
       return res.status(404).json({ message: error.message });
     }
 
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
+
+/**
+ * 북마크한 게시글 목록 조회
+ * GET /api/articles/me/bookmarked
+ */
+export const getBookmarkedArticles = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
+    const userId = req.user.userId; // authMiddleware로 보호됨
+
+    const result = await articleService.getBookmarkedArticles(
+      limit,
+      offset,
+      userId
+    );
+
+    res.status(200).json({
+      message: "북마크한 게시글 목록 조회 성공",
+      data: result.data,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    console.error("북마크한 게시글 목록 조회 오류:", error);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 };

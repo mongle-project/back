@@ -101,9 +101,10 @@ export const getPetById = async (petId, requestingUserId) => {
  * @param {number} requestingUserId - 요청 사용자 ID
  * @param {Object} updates - 업데이트할 필드
  * @param {Object} newImageFile - 새 이미지 파일 (optional)
+ * @param {boolean} removeImage - 이미지 삭제 여부 (optional)
  * @returns {Promise<Object>} 수정된 반려동물 정보
  */
-export const updatePet = async (petId, requestingUserId, updates, newImageFile) => {
+export const updatePet = async (petId, requestingUserId, updates, newImageFile, removeImage = false) => {
   // 기존 반려동물 조회 및 ownership 검증
   const existingPet = await petModel.findPetById(petId);
 
@@ -118,8 +119,19 @@ export const updatePet = async (petId, requestingUserId, updates, newImageFile) 
   let oldImageUrl = existingPet.img_url;
 
   try {
+    // 이미지 삭제 요청
+    if (removeImage && !newImageFile) {
+      updates.img_url = null;
+
+      // 기존 이미지 삭제
+      if (oldImageUrl) {
+        await s3Service.deleteFromS3(oldImageUrl).catch((err) => {
+          console.error("[Pet Service] 기존 이미지 삭제 실패:", err);
+        });
+      }
+    }
     // 새 이미지 업로드
-    if (newImageFile) {
+    else if (newImageFile) {
       const newImageUrl = await s3Service.uploadToS3(newImageFile, requestingUserId);
       updates.img_url = newImageUrl;
 

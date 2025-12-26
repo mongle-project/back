@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import apiRouter from "./routes/index.js";
 import pool from "./config/db.config.js";
-import { startNewsCronJob, initializeNewsCache } from './jobs/news.job.js';
+import { startNewsCronJob, initializeNewsCache } from "./jobs/news.job.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;

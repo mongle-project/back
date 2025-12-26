@@ -3,12 +3,24 @@ import pool from "../config/db.config.js";
 /**
  * 게시글 생성
  */
-export const insertArticle = async ({ userId, title, content, category, imgUrl }) => {
+export const insertArticle = async ({
+  userId,
+  title,
+  content,
+  category,
+  imgUrl,
+}) => {
   const query = `
     INSERT INTO articles (user_id, title, content, category, img_url)
     VALUES (?, ?, ?, ?, ?)
   `;
-  const [result] = await pool.query(query, [userId, title, content, category, imgUrl]);
+  const [result] = await pool.query(query, [
+    userId,
+    title,
+    content,
+    category,
+    imgUrl,
+  ]);
   return result.insertId;
 };
 
@@ -105,7 +117,24 @@ export const deleteArticle = async (articleId) => {
  * - likesCount, commentsCount, bookmarksCount
  * - liked, bookmarked (userId가 있을 때만)
  */
-export const getArticlesWithStats = async (limit, offset, userId = null) => {
+export const getArticlesWithStats = async (
+  limit,
+  offset,
+  userId = null,
+  sort = "latest"
+) => {
+  // 정렬 조건 결정
+  let orderByClause;
+  switch (sort) {
+    case "popular":
+      orderByClause = "ORDER BY likesCount DESC, a.created_at DESC";
+      break;
+    case "latest":
+    default:
+      orderByClause = "ORDER BY a.created_at DESC";
+      break;
+  }
+
   const query = `
     SELECT
       a.id,
@@ -119,8 +148,16 @@ export const getArticlesWithStats = async (limit, offset, userId = null) => {
       COALESCE(likes.count, 0) AS likesCount,
       0 AS commentsCount,
       COALESCE(bookmarks.count, 0) AS bookmarksCount
-      ${userId ? ', IF(user_likes.user_id IS NOT NULL, true, false) AS liked' : ''}
-      ${userId ? ', IF(user_bookmarks.user_id IS NOT NULL, true, false) AS bookmarked' : ''}
+      ${
+        userId
+          ? ", IF(user_likes.user_id IS NOT NULL, true, false) AS liked"
+          : ""
+      }
+      ${
+        userId
+          ? ", IF(user_bookmarks.user_id IS NOT NULL, true, false) AS bookmarked"
+          : ""
+      }
     FROM articles a
     LEFT JOIN (
       SELECT article_id, COUNT(*) AS count
@@ -132,9 +169,17 @@ export const getArticlesWithStats = async (limit, offset, userId = null) => {
       FROM user_save_articles
       GROUP BY article_id
     ) bookmarks ON a.id = bookmarks.article_id
-    ${userId ? 'LEFT JOIN article_likes user_likes ON a.id = user_likes.article_id AND user_likes.user_id = ?' : ''}
-    ${userId ? 'LEFT JOIN user_save_articles user_bookmarks ON a.id = user_bookmarks.article_id AND user_bookmarks.user_id = ?' : ''}
-    ORDER BY a.created_at DESC
+    ${
+      userId
+        ? "LEFT JOIN article_likes user_likes ON a.id = user_likes.article_id AND user_likes.user_id = ?"
+        : ""
+    }
+    ${
+      userId
+        ? "LEFT JOIN user_save_articles user_bookmarks ON a.id = user_bookmarks.article_id AND user_bookmarks.user_id = ?"
+        : ""
+    }
+    ${orderByClause}
     LIMIT ? OFFSET ?
   `;
 
@@ -180,7 +225,13 @@ export const getMyArticlesWithStats = async (limit, offset, userId) => {
     LIMIT ? OFFSET ?
   `;
 
-  const [rows] = await pool.query(query, [userId, userId, userId, limit, offset]);
+  const [rows] = await pool.query(query, [
+    userId,
+    userId,
+    userId,
+    limit,
+    offset,
+  ]);
   return rows;
 };
 
@@ -201,8 +252,16 @@ export const getArticleWithStats = async (articleId, userId = null) => {
       COALESCE(likes.count, 0) AS likesCount,
       0 AS commentsCount,
       COALESCE(bookmarks.count, 0) AS bookmarksCount
-      ${userId ? ', IF(user_likes.user_id IS NOT NULL, true, false) AS liked' : ''}
-      ${userId ? ', IF(user_bookmarks.user_id IS NOT NULL, true, false) AS bookmarked' : ''}
+      ${
+        userId
+          ? ", IF(user_likes.user_id IS NOT NULL, true, false) AS liked"
+          : ""
+      }
+      ${
+        userId
+          ? ", IF(user_bookmarks.user_id IS NOT NULL, true, false) AS bookmarked"
+          : ""
+      }
     FROM articles a
     LEFT JOIN (
       SELECT article_id, COUNT(*) AS count
@@ -216,8 +275,16 @@ export const getArticleWithStats = async (articleId, userId = null) => {
       WHERE article_id = ?
       GROUP BY article_id
     ) bookmarks ON a.id = bookmarks.article_id
-    ${userId ? 'LEFT JOIN article_likes user_likes ON a.id = user_likes.article_id AND user_likes.user_id = ?' : ''}
-    ${userId ? 'LEFT JOIN user_save_articles user_bookmarks ON a.id = user_bookmarks.article_id AND user_bookmarks.user_id = ?' : ''}
+    ${
+      userId
+        ? "LEFT JOIN article_likes user_likes ON a.id = user_likes.article_id AND user_likes.user_id = ?"
+        : ""
+    }
+    ${
+      userId
+        ? "LEFT JOIN user_save_articles user_bookmarks ON a.id = user_bookmarks.article_id AND user_bookmarks.user_id = ?"
+        : ""
+    }
     WHERE a.id = ?
   `;
 
@@ -335,4 +402,54 @@ export const checkBookmarkExists = async (userId, articleId) => {
   `;
   const [rows] = await pool.query(query, [userId, articleId]);
   return rows.length > 0;
+};
+
+/**
+ * 북마크한 게시글 수 조회
+ */
+export const countBookmarkedArticles = async (userId) => {
+  const query = `SELECT COUNT(*) as count FROM user_save_articles WHERE user_id = ?`;
+  const [rows] = await pool.query(query, [userId]);
+  return rows[0].count;
+};
+
+/**
+ * 북마크한 게시글 목록 조회 (통계 포함)
+ */
+export const getBookmarkedArticlesWithStats = async (limit, offset, userId) => {
+  const query = `
+    SELECT
+      a.id,
+      a.user_id,
+      a.title,
+      a.content,
+      a.category,
+      a.img_url,
+      a.created_at,
+      a.updated_at,
+      COALESCE(likes.count, 0) AS likesCount,
+      0 AS commentsCount,
+      COALESCE(bookmarks.count, 0) AS bookmarksCount,
+      IF(user_likes.user_id IS NOT NULL, true, false) AS liked,
+      true AS bookmarked
+    FROM user_save_articles usa
+    INNER JOIN articles a ON usa.article_id = a.id
+    LEFT JOIN (
+      SELECT article_id, COUNT(*) AS count
+      FROM article_likes
+      GROUP BY article_id
+    ) likes ON a.id = likes.article_id
+    LEFT JOIN (
+      SELECT article_id, COUNT(*) AS count
+      FROM user_save_articles
+      GROUP BY article_id
+    ) bookmarks ON a.id = bookmarks.article_id
+    LEFT JOIN article_likes user_likes ON a.id = user_likes.article_id AND user_likes.user_id = ?
+    WHERE usa.user_id = ?
+    ORDER BY usa.created_at DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  const [rows] = await pool.query(query, [userId, userId, limit, offset]);
+  return rows;
 };
