@@ -1,7 +1,15 @@
 import * as articleModel from "../models/article.model.js";
 import * as s3Service from "./s3.service.js";
 
-const VALID_CATEGORIES = ['dog', 'cat', 'small', 'bird', 'reptile', 'fish', 'etc'];
+const VALID_CATEGORIES = [
+  "dog",
+  "cat",
+  "small",
+  "bird",
+  "reptile",
+  "fish",
+  "etc",
+];
 
 /**
  * 게시글 생성
@@ -11,7 +19,9 @@ export const createArticle = async (userId, articleData, imageFile) => {
 
   // 카테고리 검증
   if (category && !VALID_CATEGORIES.includes(category)) {
-    throw new Error(`유효하지 않은 카테고리입니다. 가능한 값: ${VALID_CATEGORIES.join(', ')}`);
+    throw new Error(
+      `유효하지 않은 카테고리입니다. 가능한 값: ${VALID_CATEGORIES.join(", ")}`
+    );
   }
 
   let imgUrl = null;
@@ -19,7 +29,7 @@ export const createArticle = async (userId, articleData, imageFile) => {
   try {
     // 이미지 업로드 (있는 경우)
     if (imageFile) {
-      imgUrl = await s3Service.uploadToS3(imageFile, userId, 'articles');
+      imgUrl = await s3Service.uploadToS3(imageFile, userId, "articles");
     }
 
     // DB에 게시글 저장
@@ -32,9 +42,11 @@ export const createArticle = async (userId, articleData, imageFile) => {
     });
 
     // 생성된 게시글 조회 (통계 포함)
-    const createdArticle = await articleModel.getArticleWithStats(articleId, userId);
+    const createdArticle = await articleModel.getArticleWithStats(
+      articleId,
+      userId
+    );
     return createdArticle;
-
   } catch (error) {
     // S3 업로드 실패 시 정리
     if (imgUrl) {
@@ -51,9 +63,19 @@ export const createArticle = async (userId, articleData, imageFile) => {
 /**
  * 게시글 목록 조회
  */
-export const getArticles = async (limit = 20, offset = 0, requestingUserId = null) => {
+export const getArticles = async (
+  limit = 20,
+  offset = 0,
+  requestingUserId = null,
+  sort = "latest"
+) => {
   // 통계와 함께 게시글 조회
-  const articles = await articleModel.getArticlesWithStats(limit, offset, requestingUserId);
+  const articles = await articleModel.getArticlesWithStats(
+    limit,
+    offset,
+    requestingUserId,
+    sort
+  );
 
   // 전체 개수 조회
   const totalCount = await articleModel.countArticles();
@@ -74,7 +96,11 @@ export const getArticles = async (limit = 20, offset = 0, requestingUserId = nul
  */
 export const getMyArticles = async (limit = 20, offset = 0, userId) => {
   // 내 게시글만 조회
-  const articles = await articleModel.getMyArticlesWithStats(limit, offset, userId);
+  const articles = await articleModel.getMyArticlesWithStats(
+    limit,
+    offset,
+    userId
+  );
 
   // 내 게시글 전체 개수 조회
   const totalCount = await articleModel.countMyArticles(userId);
@@ -94,7 +120,10 @@ export const getMyArticles = async (limit = 20, offset = 0, userId) => {
  * 게시글 상세 조회
  */
 export const getArticleById = async (articleId, requestingUserId = null) => {
-  const article = await articleModel.getArticleWithStats(articleId, requestingUserId);
+  const article = await articleModel.getArticleWithStats(
+    articleId,
+    requestingUserId
+  );
 
   if (!article) {
     throw new Error("게시글을 찾을 수 없습니다.");
@@ -106,7 +135,12 @@ export const getArticleById = async (articleId, requestingUserId = null) => {
 /**
  * 게시글 수정
  */
-export const updateArticle = async (articleId, requestingUserId, updates, newImageFile) => {
+export const updateArticle = async (
+  articleId,
+  requestingUserId,
+  updates,
+  newImageFile
+) => {
   // 기존 게시글 조회 (ownership 검증용)
   const existingArticle = await articleModel.findArticleById(articleId);
 
@@ -120,7 +154,9 @@ export const updateArticle = async (articleId, requestingUserId, updates, newIma
 
   // 카테고리 검증
   if (updates.category && !VALID_CATEGORIES.includes(updates.category)) {
-    throw new Error(`유효하지 않은 카테고리입니다. 가능한 값: ${VALID_CATEGORIES.join(', ')}`);
+    throw new Error(
+      `유효하지 않은 카테고리입니다. 가능한 값: ${VALID_CATEGORIES.join(", ")}`
+    );
   }
 
   const updateData = { ...updates };
@@ -129,7 +165,11 @@ export const updateArticle = async (articleId, requestingUserId, updates, newIma
   try {
     // 새 이미지 업로드
     if (newImageFile) {
-      const newImgUrl = await s3Service.uploadToS3(newImageFile, requestingUserId, 'articles');
+      const newImgUrl = await s3Service.uploadToS3(
+        newImageFile,
+        requestingUserId,
+        "articles"
+      );
       updateData.img_url = newImgUrl;
     }
 
@@ -146,9 +186,11 @@ export const updateArticle = async (articleId, requestingUserId, updates, newIma
     }
 
     // 수정된 게시글 조회 (통계 포함)
-    const updatedArticle = await articleModel.getArticleWithStats(articleId, requestingUserId);
+    const updatedArticle = await articleModel.getArticleWithStats(
+      articleId,
+      requestingUserId
+    );
     return updatedArticle;
-
   } catch (error) {
     // 새 이미지 업로드 실패 시 정리
     if (newImageFile && updateData.img_url) {
@@ -207,10 +249,10 @@ export const toggleLike = async (articleId, userId) => {
   let action;
   if (exists) {
     await articleModel.deleteLike(userId, articleId);
-    action = 'removed';
+    action = "removed";
   } else {
     await articleModel.insertLike(userId, articleId);
-    action = 'added';
+    action = "added";
   }
 
   // 좋아요 수 조회
@@ -258,13 +300,38 @@ export const toggleBookmark = async (articleId, userId) => {
   let action;
   if (exists) {
     await articleModel.deleteBookmark(userId, articleId);
-    action = 'removed';
+    action = "removed";
   } else {
     await articleModel.insertBookmark(userId, articleId);
-    action = 'added';
+    action = "added";
   }
 
   return {
     action,
+  };
+};
+
+/**
+ * 북마크한 게시글 목록 조회
+ */
+export const getBookmarkedArticles = async (limit = 20, offset = 0, userId) => {
+  // 북마크한 게시글 조회
+  const articles = await articleModel.getBookmarkedArticlesWithStats(
+    limit,
+    offset,
+    userId
+  );
+
+  // 북마크한 게시글 전체 개수 조회
+  const totalCount = await articleModel.countBookmarkedArticles(userId);
+
+  return {
+    data: articles,
+    pagination: {
+      limit,
+      offset,
+      totalCount,
+      hasNext: offset + limit < totalCount,
+    },
   };
 };
