@@ -13,6 +13,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
+  timezone: "+09:00", // 한국 시간대 설정
 });
 
 // 연결 테스트 함수

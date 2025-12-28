@@ -29,7 +29,9 @@ export const insertArticle = async ({
  */
 export const findArticles = async (limit, offset) => {
   const query = `
-    SELECT id, user_id, title, content, category, img_url, created_at, updated_at
+    SELECT id, user_id, title, content, category, img_url,
+      CONVERT_TZ(created_at, '+00:00', '+09:00') as created_at,
+      CONVERT_TZ(updated_at, '+00:00', '+09:00') as updated_at
     FROM articles
     ORDER BY created_at DESC
     LIMIT ? OFFSET ?
@@ -61,7 +63,9 @@ export const countMyArticles = async (userId) => {
  */
 export const findArticleById = async (articleId) => {
   const query = `
-    SELECT id, user_id, title, content, category, img_url, created_at, updated_at
+    SELECT id, user_id, title, content, category, img_url,
+      CONVERT_TZ(created_at, '+00:00', '+09:00') as created_at,
+      CONVERT_TZ(updated_at, '+00:00', '+09:00') as updated_at
     FROM articles
     WHERE id = ?
   `;
@@ -143,8 +147,8 @@ export const getArticlesWithStats = async (
       a.content,
       a.category,
       a.img_url,
-      a.created_at,
-      a.updated_at,
+      CONVERT_TZ(a.created_at, '+00:00', '+09:00') as created_at,
+      CONVERT_TZ(a.updated_at, '+00:00', '+09:00') as updated_at,
       COALESCE(likes.count, 0) AS likesCount,
       0 AS commentsCount,
       COALESCE(bookmarks.count, 0) AS bookmarksCount
@@ -200,8 +204,8 @@ export const getMyArticlesWithStats = async (limit, offset, userId) => {
       a.content,
       a.category,
       a.img_url,
-      a.created_at,
-      a.updated_at,
+      CONVERT_TZ(a.created_at, '+00:00', '+09:00') as created_at,
+      CONVERT_TZ(a.updated_at, '+00:00', '+09:00') as updated_at,
       COALESCE(likes.count, 0) AS likesCount,
       0 AS commentsCount,
       COALESCE(bookmarks.count, 0) AS bookmarksCount,
@@ -247,8 +251,8 @@ export const getArticleWithStats = async (articleId, userId = null) => {
       a.content,
       a.category,
       a.img_url,
-      a.created_at,
-      a.updated_at,
+      CONVERT_TZ(a.created_at, '+00:00', '+09:00') as created_at,
+      CONVERT_TZ(a.updated_at, '+00:00', '+09:00') as updated_at,
       COALESCE(likes.count, 0) AS likesCount,
       0 AS commentsCount,
       COALESCE(bookmarks.count, 0) AS bookmarksCount
@@ -425,8 +429,8 @@ export const getBookmarkedArticlesWithStats = async (limit, offset, userId) => {
       a.content,
       a.category,
       a.img_url,
-      a.created_at,
-      a.updated_at,
+      CONVERT_TZ(a.created_at, '+00:00', '+09:00') as created_at,
+      CONVERT_TZ(a.updated_at, '+00:00', '+09:00') as updated_at,
       COALESCE(likes.count, 0) AS likesCount,
       0 AS commentsCount,
       COALESCE(bookmarks.count, 0) AS bookmarksCount,
