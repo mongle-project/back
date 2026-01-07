@@ -3,8 +3,12 @@ import * as s3Service from "./s3.service.js";
 
 const VALID_CATEGORIES = [
   "dog",
+  "rabbit",
   "cat",
   "small",
+  "hamster",
+  "guineapig",
+  "turtle",
   "bird",
   "reptile",
   "fish",

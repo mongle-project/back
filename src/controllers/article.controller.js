@@ -10,6 +10,8 @@ export const createArticle = async (req, res) => {
     const { title, content, category } = req.body;
     const imageFile = req.file; // multer upload.single("imageFile")
 
+    console.log(category);
+
     // 필수 필드 검증
     if (!title || !content) {
       return res.status(400).json({
