@@ -2,28 +2,12 @@
 
 > 반려동물 관리 및 커뮤니티 플랫폼 - 백엔드 API 서버
 
-Mongle 백엔드는 반려동물 관리, 커뮤니티, AI 건강 상담 등을 제공하는 RESTful API 서버입니다. Express.js 기반으로 구축되었으며, **AWS EC2에 호스팅된 MySQL 클라우드 데이터베이스**를 사용하여 팀원 간 협업을 지원합니다.
+Mongle 백엔드는 반려동물 관리, 커뮤니티, AI 건강 상담 등을 제공하는 RESTful API 서버입니다. Express.js 기반으로 구축되었으며, **AWS EC2에 호스팅된 MySQL 클라우드 데이터베이스**를 사용하여 구축하였습니다.
 
 [![Express](https://img.shields.io/badge/Express-5.2.1-000000?logo=express)](https://expressjs.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-2.0-4479A1?logo=mysql)](https://www.mysql.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)](https://nodejs.org/)
 [![AWS](https://img.shields.io/badge/AWS-EC2%20%2B%20S3-FF9900?logo=amazon-aws)](https://aws.amazon.com/)
-
----
-
-## 📋 목차
-
-- [주요 기능](#-주요-기능)
-- [기술 스택](#-기술-스택)
-- [프로젝트 구조](#-프로젝트-구조)
-- [시작하기](#-시작하기)
-- [환경 변수 설정](#-환경-변수-설정)
-- [데이터베이스 구조](#-데이터베이스-구조)
-- [API 엔드포인트](#-api-엔드포인트)
-- [아키텍처](#-아키텍처)
-- [미들웨어](#-미들웨어)
-- [개발 현황](#-개발-현황)
-- [API 테스트](#-api-테스트)
 
 ---
 
@@ -34,12 +18,12 @@ Mongle 백엔드는 반려동물 관리, 커뮤니티, AI 건강 상담 등을 �
 - Access Token + Refresh Token
 - Bearer 토큰 인증
 
-### 🐾 반려동물 프로필 관리 ✅ 완성
+### 🐾 반려동물 프로필 관리
 - CRUD 기능 (등록/조회/수정/삭제)
 - AWS S3 이미지 업로드
 - 소유권 검증 (사용자는 자신의 반려동물만 관리)
 
-### 🏥 위치 기반 서비스 ✅ 완성
+### 🏥 위치 기반 서비스
 - **동물병원 검색** - Haversine 공식 기반 거리 계산
 - **보호소 검색** - GPS 좌표 또는 키워드 검색
 - 페이지네이션 지원 (무한 스크롤)
@@ -55,12 +39,12 @@ Mongle 백엔드는 반려동물 관리, 커뮤니티, AI 건강 상담 등을 �
 - 월별 일정 조회
 - D-Day 계산
 
-### 🤖 AI 건강 상담 ✅ 완성
+### 🤖 AI 건강 상담
 - **OpenAI GPT-4o-mini** 통합
 - 증상 분석 및 권장 조치 제공
 - JSON Schema 구조화된 응답
 
-### 📰 뉴스 피드 ✅ 완성
+### 📰 뉴스 피드
 - **Puppeteer 기반 뉴스 크롤링**
 - 다음(Daum) 동물 뉴스 수집
 - 일반 뉴스 + 입양 뉴스 분류
@@ -120,51 +104,51 @@ server/
 │   │   ├── index.js                    # 라우트 통합 관리
 │   │   ├── auth.route.js               # 인증 라우트
 │   │   ├── user.route.js               # 사용자 라우트
-│   │   ├── pet.route.js                # 반려동물 라우트 ✅
+│   │   ├── pet.route.js                # 반려동물 라우트
 │   │   ├── article.route.js            # 게시글 라우트
 │   │   ├── calendar.route.js           # 캘린더 라우트
-│   │   ├── hospital.route.js           # 병원 라우트 ✅
-│   │   ├── shelter.route.js            # 보호소 라우트 ✅
-│   │   ├── news.route.js               # 뉴스 라우트 ✅
-│   │   └── health.route.js             # AI 상담 라우트 ✅
+│   │   ├── hospital.route.js           # 병원 라우트
+│   │   ├── shelter.route.js            # 보호소 라우트
+│   │   ├── news.route.js               # 뉴스 라우트
+│   │   └── health.route.js             # AI 상담 라우트
 │   │
 │   ├── controllers/                    # 요청 처리 핸들러
 │   │   ├── auth.controller.js          # 인증 컨트롤러
 │   │   ├── user.controller.js          # 사용자 컨트롤러
-│   │   ├── pet.controller.js           # 반려동물 컨트롤러 ✅
+│   │   ├── pet.controller.js           # 반려동물 컨트롤러
 │   │   ├── article.controller.js       # 게시글 컨트롤러
 │   │   ├── calendar.controller.js      # 캘린더 컨트롤러
-│   │   ├── hospital.controller.js      # 병원 컨트롤러 ✅
-│   │   ├── shelter.controller.js       # 보호소 컨트롤러 ✅
-│   │   ├── news.controller.js          # 뉴스 컨트롤러 ✅
-│   │   └── health.controller.js        # AI 상담 컨트롤러 ✅
+│   │   ├── hospital.controller.js      # 병원 컨트롤러
+│   │   ├── shelter.controller.js       # 보호소 컨트롤러
+│   │   ├── news.controller.js          # 뉴스 컨트롤러
+│   │   └── health.controller.js        # AI 상담 컨트롤러
 │   │
 │   ├── services/                       # 비즈니스 로직
 │   │   ├── auth.service.js             # JWT 생성/검증
 │   │   ├── user.service.js             # 회원가입/검증
-│   │   ├── pet.service.js              # 반려동물 로직 ✅
+│   │   ├── pet.service.js              # 반려동물 로직
 │   │   ├── article.service.js          # 게시글 로직
 │   │   ├── calendar.service.js         # 캘린더 로직
-│   │   ├── hospital.service.js         # 병원 검색 로직 ✅
-│   │   ├── shelter.service.js          # 보호소 검색 로직 ✅
-│   │   ├── news.service.js             # 크롤링 로직 ✅
-│   │   ├── health.service.js           # GPT API 통합 ✅
-│   │   └── s3.service.js               # S3 업로드/삭제 ✅
+│   │   ├── hospital.service.js         # 병원 검색 로직 
+│   │   ├── shelter.service.js          # 보호소 검색 로직 
+│   │   ├── news.service.js             # 크롤링 로직 
+│   │   ├── health.service.js           # GPT API 통합 
+│   │   └── s3.service.js               # S3 업로드/삭제 
 │   │
 │   ├── models/                         # 데이터베이스 쿼리
 │   │   ├── user.model.js               # users 테이블
-│   │   ├── pet.model.js                # pet_profiles 테이블 ✅
+│   │   ├── pet.model.js                # pet_profiles 테이블 
 │   │   ├── article.model.js            # articles 테이블
 │   │   ├── calendar.model.js           # calendar_events 테이블
-│   │   ├── hospital.model.js           # hospitals 테이블 ✅
-│   │   └── shelter.model.js            # shelters 테이블 ✅
+│   │   ├── hospital.model.js           # hospitals 테이블 
+│   │   └── shelter.model.js            # shelters 테이블 
 │   │
 │   ├── middlewares/                    # 미들웨어
-│   │   ├── auth.middleware.js          # JWT 검증 ✅
-│   │   └── upload.middleware.js        # Multer 설정 ✅
+│   │   ├── auth.middleware.js          # JWT 검증 
+│   │   └── upload.middleware.js        # Multer 설정 
 │   │
 │   └── jobs/                           # 백그라운드 작업
-│       └── news.job.js                 # 뉴스 크롤링 크론잡 ✅
+│       └── news.job.js                 # 뉴스 크롤링 크론잡 
 │
 ├── .env                                # 환경 변수 (git 제외)
 ├── .gitignore                          # Git 무시 설정
@@ -213,7 +197,7 @@ npm start
 
 ```bash
 # 데이터베이스 (AWS EC2 MySQL)
-DB_HOST=3.106.133.88
+DB_HOST=DB_HOST
 DB_PORT=3306
 DB_NAME=animaldictionary
 DB_USER=animal1
@@ -576,72 +560,10 @@ GET /api/pets
 
 ---
 
-## 🔒 미들웨어
-
-### 인증 미들웨어 ([src/middlewares/auth.middleware.js](src/middlewares/auth.middleware.js))
-
-**authMiddleware** (필수 인증)
-```javascript
-// Authorization: Bearer {token}
-const token = req.headers.authorization?.split(" ")[1];
-const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
-req.user = { userId: decoded.id, email: decoded.email };
-```
-
-**optionalAuthMiddleware** (선택적 인증)
-```javascript
-// 토큰이 있으면 검증, 없으면 통과
-if (token) {
-  req.user = jwt.verify(token, JWT_ACCESS_SECRET);
-}
-```
-
-**적용 경로**:
-- `/pets/*`, `/calendar-events/*` - authMiddleware (필수)
-- `/articles/` - optionalAuthMiddleware (선택)
-
-### 파일 업로드 미들웨어 ([src/middlewares/upload.middleware.js](src/middlewares/upload.middleware.js))
-
-```javascript
-const upload = multer({
-  storage: memoryStorage(),      // 메모리 스토리지 (S3 업로드 전)
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png"];
-    if (!allowedTypes.includes(file.mimetype)) {
-      return cb(new Error("JPG, PNG만 허용됩니다."));
-    }
-    cb(null, true);
-  },
-  limits: { fileSize: 5 * 1024 * 1024 }  // 5MB
-});
-
-// 사용: upload.single("imageFile")
-```
-
 **트랜잭션 처리**:
 1. S3 업로드 먼저 → DB insert
 2. DB insert 실패 시 S3 cleanup (롤백)
 3. 업데이트 시: 새 이미지 업로드 성공 후 기존 이미지 삭제
-
----
-
-## 📊 개발 현황
-
-### ✅ 완성된 기능 (프론트엔드 연동 가능)
-- **반려동물 프로필 API** - CRUD + AWS S3 이미지 업로드
-- **병원 위치 API** - Haversine 거리 계산, 위치/도시 기반 검색
-- **보호소 위치 API** - Haversine 거리 계산, 위치/키워드 검색
-- **AI 건강 상담** - GPT-4o-mini 통합
-- **뉴스 피드** - Puppeteer 크롤링 + 캐싱 + 크론잡
-- **인증 미들웨어** - JWT 검증, Bearer 토큰 파싱
-- **파일 업로드 미들웨어** - Multer 설정, S3 연동
-- **S3 서비스** - 업로드/삭제/URL 생성
-
-### ⚠️ 구조 정의 완료 (로직 구현 필요)
-- **인증 시스템** - 로그인/로그아웃/토큰 갱신 (구조만 완성)
-- **사용자 관리** - 회원가입/프로필/비밀번호 재설정 (구조만 완성)
-- **커뮤니티 게시글** - CRUD/댓글/좋아요/북마크 (라우트/컨트롤러만 정의)
-- **캘린더 이벤트** - CRUD (라우트/컨트롤러만 정의)
 
 ---
 
@@ -704,27 +626,6 @@ curl "http://localhost:3001/api/news"
 
 ## 🔧 주요 기술 구현
 
-### Haversine 공식 (거리 계산)
-
-병원/보호소 검색에서 GPS 좌표 기반 거리 계산:
-
-```sql
-SELECT *,
-  (6371000 * acos(
-    cos(radians(?)) * cos(radians(latitude)) *
-    cos(radians(longitude) - radians(?)) +
-    sin(radians(?)) * sin(radians(latitude))
-  )) AS distance
-FROM hospitals
-HAVING distance <= ?
-ORDER BY distance ASC
-```
-
-**변수**:
-- `6371000` - 지구 반지름 (미터)
-- `?` - 사용자 위도, 경도
-- `distance` - 계산된 거리 (미터)
-
 ### AWS S3 이미지 업로드
 
 ```javascript
@@ -761,37 +662,3 @@ const newsData = await page.evaluate(() => {
 
 await browser.close();
 ```
-
----
-
-## 📚 참고 자료
-
-- [Express 공식 문서](https://expressjs.com/)
-- [MySQL2 공식 문서](https://github.com/sidorares/node-mysql2)
-- [AWS S3 SDK 문서](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/)
-- [OpenAI API 문서](https://platform.openai.com/docs/api-reference)
-- [Puppeteer 공식 문서](https://pptr.dev/)
-
----
-
-## 📝 라이선스
-
-이 프로젝트는 MIT 라이선스를 따릅니다.
-
----
-
-## 👥 기여
-
-프로젝트에 기여하고 싶으시다면 Pull Request를 보내주세요!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📧 문의
-
-프로젝트 관련 문의사항이 있으시면 이슈를 등록해주세요.
